@@ -1,23 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import {v4 as uuid} from "uuid";
+import Header from "./components/Header";
+import AddIntern from "./components/AddIntern";
+import { useEffect, useState } from "react";
+import InternList from "./components/InternsList";
 
 function App() {
+  const LOCAL_STORAGE_KEY = "interns";
+  const [interns, setInterns] = useState(
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) ?? []
+  );
+
+  const addInternHandler = (contact) => {
+    setInterns([...interns, { id: uuid(), ...contact }]);
+  };
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(interns));
+  }, [interns]);
+
+  const removeInternsFromList = (id) => {
+    const newInternList = interns.filter((intern) => {
+      return intern.id !== id
+    });
+
+    setInterns(newInternList);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="ui container">
+      <Header />
+      <AddIntern addInternHander={addInternHandler} />
+      <InternList internsObj={interns} getInternId={removeInternsFromList}/>
     </div>
   );
 }
